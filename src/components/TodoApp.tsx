@@ -8,10 +8,11 @@ import { Calendar } from "./Calendar";
 import { Analytics } from "./Analytics";
 import { ProjectManager } from "./ProjectManager";
 import { TagManager } from "./TagManager";
+import { RecurringTaskManager } from "./RecurringTaskManager";
 import { Header } from "./Header";
 import { CreateTodoModal } from "./CreateTodoModal";
 
-type View = "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags";
+type View = "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring";
 
 export function TodoApp() {
   const [currentView, setCurrentView] = useState<View>("today");
@@ -43,6 +44,8 @@ export function TodoApp() {
         return "Projects";
       case "tags":
         return "Tags";
+      case "recurring":
+        return "Recurring Tasks";
       case "project":
         const project = projects?.find(p => p._id === selectedProjectId);
         return project?.name || "Project";
@@ -66,6 +69,8 @@ export function TodoApp() {
         return <ProjectManager />;
       case "tags":
         return <TagManager />;
+      case "recurring":
+        return <RecurringTaskManager />;
       default:
         return (
           <TodoList

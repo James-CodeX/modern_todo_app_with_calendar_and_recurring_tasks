@@ -10,13 +10,14 @@ import {
   ChartBarIcon,
   TagIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
 interface SidebarProps {
   currentView: string;
   selectedProjectId: string | null;
-  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags", projectId?: string) => void;
+  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring", projectId?: string) => void;
   onCreateTodo: () => void;
 }
 
@@ -34,6 +35,7 @@ export function Sidebar({ currentView, selectedProjectId, onViewChange, onCreate
   const managementItems = [
     { id: "projects", label: "Manage Projects", icon: FolderIcon },
     { id: "tags", label: "Manage Tags", icon: TagIcon },
+    { id: "recurring", label: "Recurring Tasks", icon: ArrowPathIcon },
   ];
 
   return (

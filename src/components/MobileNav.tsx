@@ -10,13 +10,14 @@ import {
   ChartBarIcon,
   TagIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
 interface MobileNavProps {
   currentView: string;
   selectedProjectId: string | null;
-  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags", projectId?: string) => void;
+  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring", projectId?: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -35,6 +36,7 @@ export function MobileNav({ currentView, selectedProjectId, onViewChange, isOpen
   const managementItems = [
     { id: "projects", label: "Manage Projects", icon: FolderIcon },
     { id: "tags", label: "Manage Tags", icon: TagIcon },
+    { id: "recurring", label: "Recurring Tasks", icon: ArrowPathIcon },
   ];
 
   if (!isOpen) return null;

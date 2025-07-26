@@ -41,6 +41,7 @@ const applicationTables = {
       dayOfMonth: v.optional(v.number()), // for monthly
       endDate: v.optional(v.number()),
       maxOccurrences: v.optional(v.number()),
+      paused: v.optional(v.boolean()), // for pausing recurring task generation
     })),
     parentTodoId: v.optional(v.id("todos")), // for recurring instances
     originalDueDate: v.optional(v.number()), // for tracking recurring instances

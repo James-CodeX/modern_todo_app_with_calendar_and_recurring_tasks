@@ -17,6 +17,7 @@ import type * as analytics from "../analytics.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as projects from "../projects.js";
+import type * as recurringTasks from "../recurringTasks.js";
 import type * as router from "../router.js";
 import type * as tags from "../tags.js";
 import type * as todos from "../todos.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   projects: typeof projects;
+  recurringTasks: typeof recurringTasks;
   router: typeof router;
   tags: typeof tags;
   todos: typeof todos;
