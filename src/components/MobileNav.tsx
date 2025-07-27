@@ -17,13 +17,15 @@ import {
 interface MobileNavProps {
   currentView: string;
   selectedProjectId: string | null;
-  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring", projectId?: string) => void;
+  selectedTagId?: string | null;
+  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "tag" | "analytics" | "projects" | "tags" | "recurring", itemId?: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function MobileNav({ currentView, selectedProjectId, onViewChange, isOpen, onClose }: MobileNavProps) {
+export function MobileNav({ currentView, selectedProjectId, selectedTagId, onViewChange, isOpen, onClose }: MobileNavProps) {
   const projects = useQuery(api.projects.list) || [];
+  const tags = useQuery(api.tags.list) || [];
   const { theme, toggleTheme } = useTheme();
 
   const menuItems = [
@@ -113,7 +115,7 @@ export function MobileNav({ currentView, selectedProjectId, onViewChange, isOpen
               Projects
             </h3>
             
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-32 overflow-y-auto">
               {projects.map((project) => (
                 <button
                   key={project._id}
@@ -125,12 +127,49 @@ export function MobileNav({ currentView, selectedProjectId, onViewChange, isOpen
                   }`}
                 >
                   <div
-                    className="w-3 h-3 rounded-full mr-3"
+                    className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
                     style={{ backgroundColor: project.color }}
                   />
-                  {project.name}
+                  <span className="truncate">{project.name}</span>
                 </button>
               ))}
+              {projects.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
+                  No projects yet
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Tags Section */}
+          <div className="px-4 py-2">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+              Tags
+            </h3>
+            
+            <div className="space-y-1 max-h-32 overflow-y-auto">
+              {tags.map((tag) => (
+                <button
+                  key={tag._id}
+                  onClick={() => onViewChange("tag", tag._id)}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    currentView === "tag" && selectedTagId === tag._id
+                      ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+                    style={{ backgroundColor: tag.color }}
+                  />
+                  <span className="truncate">{tag.name}</span>
+                </button>
+              ))}
+              {tags.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
+                  No tags yet
+                </p>
+              )}
             </div>
           </div>
         </div>

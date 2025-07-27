@@ -5,6 +5,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 export const list = query({
   args: {
     projectId: v.optional(v.id("projects")),
+    tagIds: v.optional(v.id("tags")),
     date: v.optional(v.number()),
     completed: v.optional(v.boolean()),
   },
@@ -22,11 +23,26 @@ export const list = query({
     
     return todos.filter(todo => {
       if (args.completed !== undefined && todo.completed !== args.completed) return false;
-      if (args.date && todo.dueDate) {
-        const todoDate = new Date(todo.dueDate);
+      if (args.tagIds && (!todo.tagIds || !todo.tagIds.includes(args.tagIds))) return false;
+      
+      // Handle "Today" view filtering
+      if (args.date) {
         const filterDate = new Date(args.date);
-        return todoDate.toDateString() === filterDate.toDateString();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (todo.dueDate) {
+          const todoDate = new Date(todo.dueDate);
+          todoDate.setHours(0, 0, 0, 0);
+          
+          // Show tasks due today or overdue tasks
+          return todoDate.getTime() <= today.getTime();
+        } else {
+          // Show tasks without due dates only when viewing "Today"
+          return filterDate.getTime() === today.getTime();
+        }
       }
+      
       return true;
     });
   },

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useTheme } from "../contexts/ThemeContext";
@@ -11,18 +12,25 @@ import {
   TagIcon,
   SunIcon,
   MoonIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ChevronDownIcon,
+  ChevronRightIcon
 } from "@heroicons/react/24/outline";
 
 interface SidebarProps {
   currentView: string;
   selectedProjectId: string | null;
-  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring", projectId?: string) => void;
+  selectedTagId: string | null;
+  onViewChange: (view: "today" | "upcoming" | "calendar" | "project" | "tag" | "analytics" | "projects" | "tags" | "recurring", itemId?: string) => void;
   onCreateTodo: () => void;
 }
 
-export function Sidebar({ currentView, selectedProjectId, onViewChange, onCreateTodo }: SidebarProps) {
+export function Sidebar({ currentView, selectedProjectId, selectedTagId, onViewChange, onCreateTodo }: SidebarProps) {
+  const [projectsCollapsed, setProjectsCollapsed] = useState(false);
+  const [tagsCollapsed, setTagsCollapsed] = useState(false);
+  
   const projects = useQuery(api.projects.list) || [];
+  const tags = useQuery(api.tags.list) || [];
   const { theme, toggleTheme } = useTheme();
 
   const menuItems = [
@@ -102,36 +110,90 @@ export function Sidebar({ currentView, selectedProjectId, onViewChange, onCreate
 
         {/* Projects Section */}
         <div className="px-4 py-2">
-          <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => setProjectsCollapsed(!projectsCollapsed)}
+            className="w-full flex items-center justify-between mb-3 group hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 py-1 transition-colors"
+          >
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
               Projects
             </h3>
-          </div>
-          
-          <div className="space-y-1 max-h-48 overflow-y-auto">
-            {projects.map((project) => (
-              <button
-                key={project._id}
-                onClick={() => onViewChange("project", project._id)}
-                className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  currentView === "project" && selectedProjectId === project._id
-                    ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                }`}
-              >
-                <div
-                  className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
-                  style={{ backgroundColor: project.color }}
-                />
-                <span className="truncate">{project.name}</span>
-              </button>
-            ))}
-            {projects.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
-                No projects yet
-              </p>
+            {projectsCollapsed ? (
+              <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronDownIcon className="w-4 h-4 text-gray-400" />
             )}
-          </div>
+          </button>
+          
+          {!projectsCollapsed && (
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {projects.map((project) => (
+                <button
+                  key={project._id}
+                  onClick={() => onViewChange("project", project._id)}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    currentView === "project" && selectedProjectId === project._id
+                      ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+                    style={{ backgroundColor: project.color }}
+                  />
+                  <span className="truncate">{project.name}</span>
+                </button>
+              ))}
+              {projects.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
+                  No projects yet
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Tags Section */}
+        <div className="px-4 py-2">
+          <button
+            onClick={() => setTagsCollapsed(!tagsCollapsed)}
+            className="w-full flex items-center justify-between mb-3 group hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 py-1 transition-colors"
+          >
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              Tags
+            </h3>
+            {tagsCollapsed ? (
+              <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+          
+          {!tagsCollapsed && (
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {tags.map((tag) => (
+                <button
+                  key={tag._id}
+                  onClick={() => onViewChange("tag", tag._id)}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    currentView === "tag" && selectedTagId === tag._id
+                      ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+                    style={{ backgroundColor: tag.color }}
+                  />
+                  <span className="truncate">{tag.name}</span>
+                </button>
+              ))}
+              {tags.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2">
+                  No tags yet
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

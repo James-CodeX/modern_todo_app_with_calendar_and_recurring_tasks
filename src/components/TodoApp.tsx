@@ -12,21 +12,32 @@ import { RecurringTaskManager } from "./RecurringTaskManager";
 import { Header } from "./Header";
 import { CreateTodoModal } from "./CreateTodoModal";
 
-type View = "today" | "upcoming" | "calendar" | "project" | "analytics" | "projects" | "tags" | "recurring";
+type View = "today" | "upcoming" | "calendar" | "project" | "tag" | "analytics" | "projects" | "tags" | "recurring";
 
 export function TodoApp() {
   const [currentView, setCurrentView] = useState<View>("today");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const user = useQuery(api.auth.loggedInUser);
   const projects = useQuery(api.projects.list);
+  const tags = useQuery(api.tags.list);
 
-  const handleViewChange = (view: View, projectId?: string) => {
+  const handleViewChange = (view: View, itemId?: string) => {
     setCurrentView(view);
-    setSelectedProjectId(projectId || null);
+    if (view === "project") {
+      setSelectedProjectId(itemId || null);
+      setSelectedTagId(null);
+    } else if (view === "tag") {
+      setSelectedTagId(itemId || null);
+      setSelectedProjectId(null);
+    } else {
+      setSelectedProjectId(null);
+      setSelectedTagId(null);
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -49,6 +60,9 @@ export function TodoApp() {
       case "project":
         const project = projects?.find(p => p._id === selectedProjectId);
         return project?.name || "Project";
+      case "tag":
+        const tag = tags?.find(t => t._id === selectedTagId);
+        return tag?.name || "Tag";
       default:
         return "Tasks";
     }
@@ -76,6 +90,7 @@ export function TodoApp() {
           <TodoList
             view={currentView}
             projectId={selectedProjectId}
+            tagId={selectedTagId}
             selectedDate={selectedDate}
           />
         );
@@ -89,6 +104,7 @@ export function TodoApp() {
         <Sidebar
           currentView={currentView}
           selectedProjectId={selectedProjectId}
+          selectedTagId={selectedTagId}
           onViewChange={handleViewChange}
           onCreateTodo={() => setShowCreateModal(true)}
         />
@@ -113,6 +129,7 @@ export function TodoApp() {
         <MobileNav
           currentView={currentView}
           selectedProjectId={selectedProjectId}
+          selectedTagId={selectedTagId}
           onViewChange={handleViewChange}
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
